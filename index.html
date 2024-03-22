@@ -1,15 +1,134 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <title>------</title>
+    <title>-----</title>
     <link rel="shortcut icon" href="favicon.png" />
-  <style>
-    hr {
-      margin-top: 50vh;
-    }
-  </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Roboto, sans-serif;
+        font-weight: 500;
+      }
+
+      hr {
+        margin-top: 33vh;
+        margin-top: 33dvh;
+        margin-bottom: calc(33vh - 20px);
+        margin-bottom: calc(33dvh - 20px);
+      }
+
+      a {
+        color: #fff;
+        background-color: #1976d2;
+        text-decoration: none;
+        cursor: pointer;
+
+        border-color: #1976d2;
+        border-radius: 4px;
+        box-shadow:
+          0 3px 1px -2px rgba(0, 0, 0, 0.2),
+          0 2px 2px 0 rgba(0, 0, 0, 0.14),
+          0 1px 5px 0 rgba(0, 0, 0, 0.12);
+        padding: 8px;
+      }
+
+      .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #message-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        width: 100dvw;
+        height: 100vh;
+        height: 100dvh;
+        background-color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      #message-overlay.fadeinout {
+        animation: fadeinout 1.2s;
+      }
+
+      @keyframes fadeinout {
+        0,
+        100% {
+          visibility: hidden;
+          opacity: 0;
+        }
+        33%,
+        66% {
+          visibility: visible;
+          opacity: 1;
+        }
+      }
+
+      #message {
+        font-size: 48px;
+        color: #333;
+      }
+    </style>
+    <script>
+      function buildUrl(func) {
+        const url = new URL(location.href);
+        const params = url.searchParams;
+        func(params);
+        return url.toString();
+      }
+
+      function generate() {
+        const overlay = document.getElementById("message-overlay");
+        const handler = () => {
+          overlay.removeEventListener("animationend", handler);
+          overlay.classList.remove("fadeinout");
+        };
+        overlay.addEventListener("animationend", handler);
+        overlay.classList.add("fadeinout");
+
+        history.pushState(
+          {},
+          "",
+          buildUrl((params) => {
+            params.set("id", Math.floor(Math.random() * 1000000).toString());
+            params.delete("separator");
+          }),
+        );
+      }
+    </script>
   </head>
   <body>
-  <hr>
+    <hr />
+
+    <div class="center">
+      <a href="#" id="generate" onclick="generate(); return false"
+        >New Separator</a
+      >
+    </div>
+
+    <div id="message-overlay">
+      <p id="message">Generated!</p>
+    </div>
+
+    <script>
+      (function () {
+        const params = new URL(location.href).searchParams;
+        const separator = params.get("separator");
+        if (separator) document.title = separator;
+        if (params.has("separator")) document.title = params.get("separator");
+        document.getElementById("generate").href = buildUrl((params) => {
+          params.set("id", "new");
+          if (separator) params.set("separator", separator);
+        });
+        if (params.get("id") === "new") generate();
+      })();
+    </script>
   </body>
 </html>
